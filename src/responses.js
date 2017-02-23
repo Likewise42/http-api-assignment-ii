@@ -3,17 +3,6 @@ const fs = require('fs');
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const style = fs.readFileSync(`${__dirname}/../client/style.css`);
 
-const convertJSONtoXML = (json) => {
-  let xml = '<response>';
-  xml = `${xml} <msg>${json.msg}</msg>`;
-  xml = `${xml} <id>${json.id}</id>`;
-
-  xml = `${xml} </response>`;
-
-  console.dir(xml);
-  return xml;
-};
-
 const respond = (request, response, status, content, type) => {
   response.writeHead(status, { 'Content-Type': type });
 
