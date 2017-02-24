@@ -38,12 +38,14 @@ const onRequest = (request, response) => {
       res.end();
     });
 
+
     request.on('data', (chunk) => {
       body.push(chunk);
     });
 
     request.on('end', () => {
       console.log(Buffer.concat(body).toString());
+
 
       const bodyString = Buffer.concat(body).toString();
 

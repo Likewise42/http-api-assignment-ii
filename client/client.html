@@ -46,8 +46,8 @@
     }
     
     if(xhr.response){
-      const obj = JSON.parse(xhr.response);
-      console.dir(obj);
+      //const obj = JSON.parse(xhr.response);
+      //console.dir(obj);
       parseJSON(xhr, content);
     } else {
       console.log('recieved')
@@ -62,18 +62,11 @@
     const xhr = new XMLHttpRequest();
     
     xhr.open(method, url);
-    
     xhr.setRequestHeader('Accept','application/json');
     
-    if(method == 'get'){
-      xhr.onload = () => {
-        handleResponse(xhr);
-      }
-    }
-    else {
-      xhr.onload = () => {
-        handleResponse(xhr);
-      };
+
+    xhr.onload = () => {
+      handleResponse(xhr);
     }
     
     xhr.send();
