@@ -19,8 +19,6 @@ const onRequest = (request, response) => {
       responseHandler.getStyle(request, response);
     } else if (parsedUrl.pathname === '/getUsers') {
       responseHandler.getUsers(request, response);
-    } else if (parsedUrl.pathname === '/updateUser') {
-      responseHandler.updateUser(request, response);
     } else {
       responseHandler.notFound(request, response);
     }
