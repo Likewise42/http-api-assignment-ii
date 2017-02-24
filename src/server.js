@@ -8,30 +8,53 @@ const responseHandler = require('./responses.js');
 // port
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const urlStruct = {
-  '/': responseHandler.getIndex,
-  '/style.css': responseHandler.getStyle,
-  '/getUsers': responseHandler.notFound,
-  '/notReal': responseHandler.notFound,
-  '/addUser': responseHandler.notFound,
-  notFound: responseHandler.notFound,
-};
-
 const onRequest = (request, response) => {
   // parse the url
   const parsedUrl = url.parse(request.url);
-  const params = query.parse(parsedUrl.query);
 
-	console.log(parsedUrl);
-	
-  const acceptedTypes = request.headers.accept.split(',');
+  if (request.method === 'GET') {
+    if (parsedUrl.pathname === '/') {
+      responseHandler.getIndex(request, response);
+    } else if (parsedUrl.pathname === '/style.css') {
+      responseHandler.getStyle(request, response);
+    } else if (parsedUrl.pathname === '/getUsers') {
+      responseHandler.getUsers(request, response);
+    } else if (parsedUrl.pathname === '/updateUser') {
+      responseHandler.updateUser(request, response);
+    } else {
+      responseHandler.notFound(request, response);
+    }
+  } else if (request.method === 'HEAD') {
+    if (parsedUrl.pathname === '/getUsers') {
+      responseHandler.getUsersMeta(request, response);
+    } else {
+      responseHandler.notFoundMeta(request, response);
+    }
+  } else if (request.method === 'POST' && parsedUrl.pathname === '/addUser') {
+    const res = response;
 
-  if (urlStruct[parsedUrl.pathname]) {
-    console.log(parsedUrl.pathname);
-    urlStruct[parsedUrl.pathname](request, response, params, acceptedTypes[0]);
+    const body = [];
+
+    request.on('error', () => {
+      res.statusCode = 400;
+      res.end();
+    });
+
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    request.on('end', () => {
+      console.log(Buffer.concat(body).toString());
+
+      const bodyString = Buffer.concat(body).toString();
+
+      const bodyParams = query.parse(bodyString);
+
+      responseHandler.addUser(request, res, bodyParams);
+    });
   } else {
-    console.log(parsedUrl.pathname);
-    urlStruct.notFound(request, response, params, acceptedTypes[0]);
+    responseHandler.notFound(request, response);
   }
 };
 

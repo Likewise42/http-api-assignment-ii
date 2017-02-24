@@ -7,6 +7,128 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
 
+  const parseJSON = (xhr, content) => {
+    const obj = JSON.parse(xhr.response);
+    
+    if(obj.message) {
+      const p = document.createElement('p');
+      p.textContent = `Message: ${obj.message}`;
+      content.appendChild(p);
+    }
+    
+    if(obj.users) {
+      const userList = document.createElement('p');
+      const users = JSON.stringify(obj.users);
+      userList.textContent = users;
+      content.appendChild(userList);
+    }
+  };
+
+  const handleResponse = (xhr) => {
+    const content = document.querySelector('#content');
+    
+    console.log(xhr.status);
+    
+    if (xhr.status === 200){
+      content.innerHTML = '<b>Success</b>';
+    } else if(xhr.status === 201){
+      content.innerHTML = '<b>Create</b>';
+    } else if(xhr.status === 204){
+      content.innerHTML = '<b>Updated No Content</b>';
+    }else if(xhr.status === 304){
+      content.innerHTML = '<b>Not Modified</b>';
+    } else if(xhr.status === 400){
+      content.innerHTML = '<b>Bad Request</b>';
+    } else if(xhr.status === 404){
+      content.innerHTML = '<b>Resourse not available</b>';
+    } else {
+      content.innerHTML = '<b>Not Implemented</b>';
+    }
+    
+    if(xhr.response){
+      const obj = JSON.parse(xhr.response);
+      console.dir(obj);
+      parseJSON(xhr, content);
+    } else {
+      console.log('recieved')
+    }
+  };
+
+  const requestUpdate = (e, userForm) => {
+    const url = userForm.querySelector('#urlField').value;
+    
+    const method = userForm.querySelector('#methodSelect').value;
+    
+    const xhr = new XMLHttpRequest();
+    
+    xhr.open(method, url);
+    
+    xhr.setRequestHeader('Accept','application/json');
+    
+    if(method == 'get'){
+      xhr.onload = () => {
+        handleResponse(xhr);
+      }
+    }
+    else {
+      xhr.onload = () => {
+        handleResponse(xhr);
+      };
+    }
+    
+    xhr.send();
+    
+    e.preventDefault();
+    
+    return false;
+  };
+
+  const sendPost = (e, nameForm) => {
+    const nameAction = nameForm.getAttribute('action');
+    const nameMethod = nameForm.getAttribute('method');
+    
+    const nameField = nameForm.querySelector('#nameField');
+    const ageField = nameForm.querySelector('#ageField');
+    
+    const xhr = new XMLHttpRequest();
+    
+    xhr.open(nameMethod, nameAction);
+    
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    
+    xhr.setRequestHeader('Accept', 'application/json');
+    
+    xhr.onload = () =>{
+      handleResponse(xhr);
+    };
+    
+    const formData = `name=${nameField.value}&age=${ageField.value}`;
+    
+    console.log(formData);
+    xhr.send(formData);
+    
+    e.preventDefault();
+    
+    return false;
+  };
+
+  const init = () =>{
+    //user form
+    const userForm = document.querySelector('#userForm');
+    const getUsers = (e) => {
+      requestUpdate(e, userForm);
+    };
+    userForm.addEventListener('submit', getUsers);
+    
+    //name form
+    const nameForm = document.querySelector('#nameForm');
+    const addUser = (e) => {
+      sendPost(e, nameForm);
+    }
+    nameForm.addEventListener('submit', addUser);
+  };
+  
+  window.onload = init;
   </script>
 </head>
 <body>
